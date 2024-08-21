@@ -53,8 +53,6 @@ class _MyHomePageState extends State<MyHomePage> {
   GameballApp gameballApp = GameballApp.getInstance();
 
   void _testGameball() {
-    Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform).then((response){});
-
     // TODO Replace the values between the braces with the actual values
 
     gameballApp.init("{api_key}", "{lang}", "{platform}", "{shop}");

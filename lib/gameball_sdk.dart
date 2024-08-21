@@ -16,7 +16,7 @@ import 'network/request_calls/send_event_request.dart';
 import 'network/utils/constants.dart';
 import 'network/utils/header_generator.dart';
 
-class GameballApp extends StatelessWidget {
+class GameballApp  {
   static GameballApp? _instance;
   static String _apiKey = "";
   static String _playerUniqueId = "";
@@ -139,7 +139,7 @@ class GameballApp extends StatelessWidget {
   ///   - `callback`: The callback function to handle the registration result.
   void _registerDevice(
       PlayerAttributes? playerAttributes, RegisterCallback? callback) {
-    if (_playerUniqueId == null || _apiKey == null) {
+    if (_playerUniqueId.isEmpty || _apiKey.isEmpty) {
       return;
     }
 
@@ -175,7 +175,7 @@ class GameballApp extends StatelessWidget {
   void sendEvent(Event eventBody, SendEventCallback? callback) {
     try {
       sendEventRequest(eventBody, _apiKey).then((response) {
-        if (response != null && response.statusCode == 200) {
+        if (response.body.isNotEmpty && response.statusCode == 200) {
           callback!(true, null);
         } else {
           callback!(false, null);
@@ -276,9 +276,5 @@ class GameballApp extends StatelessWidget {
     return widgetUrl;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
 }
 
