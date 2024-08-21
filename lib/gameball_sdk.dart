@@ -16,7 +16,7 @@ import 'network/request_calls/send_event_request.dart';
 import 'network/utils/constants.dart';
 import 'network/utils/header_generator.dart';
 
-class GameballApp  {
+class GameballApp {
   static GameballApp? _instance;
   static String _apiKey = "";
   static String _playerUniqueId = "";
@@ -41,11 +41,12 @@ class GameballApp  {
   /// Initializes the Gameball SDK with required parameters.
   ///
   /// Sets the API key, language, platform, and shop information for subsequent SDK operations.
-  void init(String apiKey, String lang, String platform, String shop) {
+  void init({required String apiKey, String? lang, String? platform, String? shop, required String playerUniqueId}) {
     _lang = lang;
     _platform = platform;
     _shop = shop;
     _apiKey = apiKey;
+    _playerUniqueId = playerUniqueId;
   }
 
   /// Initializes Firebase Messaging and retrieves the device token.
@@ -72,8 +73,7 @@ class GameballApp  {
   /// This method is typically used in conjunction with registering a listener
   /// for dynamic links to handle referrals throughout the app's lifecycle.
   Future<void> _handleDynamicLink(ReferralCodeCallback callback) async {
-    final PendingDynamicLinkData? data =
-    await FirebaseDynamicLinks.instance.getInitialLink();
+    final PendingDynamicLinkData? data = await FirebaseDynamicLinks.instance.getInitialLink();
 
     if (data != null) {
       final Uri deepLink = data.link;
@@ -95,13 +95,12 @@ class GameballApp  {
   ///   - `playerAttributes`: Additional player attributes.
   ///   - `responseCallback`: A callback function to handle the registration response.
   Future<void> registerPlayer(
-      String playerUniqueId,
-      String? playerEmail,
-      String? playerMobile,
-      PlayerAttributes playerAttributes,
-      RegisterCallback? responseCallback,
-      ) async {
-
+    String playerUniqueId,
+    String? playerEmail,
+    String? playerMobile,
+    PlayerAttributes playerAttributes,
+    RegisterCallback? responseCallback,
+  ) async {
     _initializeFirebase();
 
     referralCodeRegistrationCallback(response, error) {
@@ -110,8 +109,7 @@ class GameballApp  {
       }
     }
 
-    await _handleDynamicLink(referralCodeRegistrationCallback)
-        .then((response) {});
+    await _handleDynamicLink(referralCodeRegistrationCallback).then((response) {});
 
     _playerUniqueId = playerUniqueId.trim();
 
@@ -137,8 +135,7 @@ class GameballApp  {
   /// Arguments:
   ///   - `playerAttributes`: Optional player attributes to include in the request.
   ///   - `callback`: The callback function to handle the registration result.
-  void _registerDevice(
-      PlayerAttributes? playerAttributes, RegisterCallback? callback) {
+  void _registerDevice(PlayerAttributes? playerAttributes, RegisterCallback? callback) {
     if (_playerUniqueId.isEmpty || _apiKey.isEmpty) {
       return;
     }
@@ -153,11 +150,7 @@ class GameballApp  {
 
     try {
       createPlayerRequest(playerRegisterRequest, _apiKey).then((response) {
-        if (response != null) {
-          callback!(response, null);
-        } else {
-          callback!(null, null);
-        }
+        callback!(response, null);
       });
     } catch (e) {
       callback!(null, e as Exception);
@@ -174,7 +167,7 @@ class GameballApp  {
   ///   - `callback`: The callback function to handle the event sending result.s
   void sendEvent(Event eventBody, SendEventCallback? callback) {
     try {
-      sendEventRequest(eventBody, _apiKey).then((response) {
+      sendEventRequest(eventBody.copyWith(playerUniqueId: () => _playerUniqueId), _apiKey).then((response) {
         if (response.body.isNotEmpty && response.statusCode == 200) {
           callback!(true, null);
         } else {
@@ -214,8 +207,7 @@ class GameballApp  {
       isDismissible: true,
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-            top: Radius.circular(20.0)), // Set the top border radius
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)), // Set the top border radius
       ),
       builder: (BuildContext context) {
         return SizedBox(
@@ -224,8 +216,7 @@ class GameballApp  {
           child: Stack(
             children: [
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(20.0)), // Set the top border radius
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(20.0)), // Set the top border radius
                 child: WebView(
                   initialUrl: _buildWidgetUrl(),
                   javascriptMode: JavascriptMode.unrestricted,
@@ -252,7 +243,7 @@ class GameballApp  {
   /// Builds the URL for the Gameball profile widget.
   ///
   /// Constructs the URL based on the provided parameters and returns it.
-  String _buildWidgetUrl(){
+  String _buildWidgetUrl() {
     String widgetUrl = widgetBaseUrl;
 
     widgetUrl += '&playerid=$_playerUniqueId';
@@ -275,6 +266,4 @@ class GameballApp  {
 
     return widgetUrl;
   }
-
 }
-

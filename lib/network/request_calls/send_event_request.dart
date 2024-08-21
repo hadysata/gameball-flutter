@@ -33,12 +33,9 @@ Future<http.Response> sendEventRequest(Event requestBody, String apiKey) async {
 
   // Check for successful response
   if (response.statusCode == 200) {
-    // Parse the JSON response and return a PlayerRegisterResponse object
-    final jsonMap = jsonDecode(response.body) as Map<String, dynamic>;
     return response;
   } else {
     // Handle error based on status code or throw an exception
-    throw Exception(
-        'Failed to send event. Status code: ${response.statusCode}');
+    throw Exception('Failed to send event. Status code: ${response.statusCode}');
   }
 }
