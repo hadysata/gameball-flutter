@@ -94,13 +94,13 @@ class GameballApp {
   ///   - `playerMobile`: The player's mobile number (optional).
   ///   - `playerAttributes`: Additional player attributes.
   ///   - `responseCallback`: A callback function to handle the registration response.
-  Future<void> registerPlayer(
-    String playerUniqueId,
+  Future<void> registerPlayer({
+   required String playerUniqueId,
     String? playerEmail,
     String? playerMobile,
-    PlayerAttributes playerAttributes,
+    PlayerAttributes? playerAttributes,
     RegisterCallback? responseCallback,
-  ) async {
+  }) async {
     _initializeFirebase();
 
     referralCodeRegistrationCallback(response, error) {
