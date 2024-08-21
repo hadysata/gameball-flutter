@@ -28,7 +28,7 @@ Future<http.Response> sendEventRequest(Event requestBody, String apiKey) async {
   final response = await http.post(
     Uri.parse(url),
     headers: getRequestHeaders(apiKey),
-    body: jsonEncode(requestBody),
+    body: requestBody.toJson(),
   );
 
   // Check for successful response
